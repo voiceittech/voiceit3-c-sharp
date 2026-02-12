@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 using RestSharp;
 using RestSharp.Authenticators;
 
-namespace VoiceIt2API
+namespace VoiceIt3API
 {
-    public class VoiceIt2
+    public class VoiceIt3
     {
         const string VERSION = "2.8.0";
         string notificationUrl = "";
         RestClient client;
 
-        public VoiceIt2(string apiKey, string apiToken)
+        public VoiceIt3(string apiKey, string apiToken)
         {
             client = new RestClient();
             client.BaseUrl = new Uri("https://api.voiceit.io");
@@ -22,7 +22,7 @@ namespace VoiceIt2API
             client.AddDefaultHeader("platformVersion", VERSION);
         }
 
-        public VoiceIt2(string apiKey, string apiToken, string customUrl)
+        public VoiceIt3(string apiKey, string apiToken, string customUrl)
         {
             client = new RestClient();
             client.BaseUrl = new Uri(customUrl);
@@ -32,7 +32,7 @@ namespace VoiceIt2API
         }
 
         // Overloaded constructor for proxy support
-        public VoiceIt2(string apiKey, string apiToken, string proxyUrl, int proxyPort)
+        public VoiceIt3(string apiKey, string apiToken, string proxyUrl, int proxyPort)
         {
             client = new RestClient();
             client.Proxy = new WebProxy(proxyUrl, proxyPort);

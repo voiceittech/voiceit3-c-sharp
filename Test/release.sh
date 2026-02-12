@@ -63,8 +63,8 @@ then
   if [[ $wrapperplatformversion = $version ]];
   then
 
-    unzip VoiceIt2.zip
-    cd VoiceIt2
+    unzip VoiceIt3.zip
+    cd VoiceIt3
 
     echo '<Project Sdk="Microsoft.NET.Sdk">
 
@@ -83,7 +83,7 @@ then
 
     </Project>' > VoiceIt.csproj
 
-    cp /home/travis/build/voiceittech/VoiceIt3-C-Sharp/VoiceIt2.cs ./VoiceIt.cs
+    cp /home/travis/build/voiceittech/VoiceIt3-C-Sharp/VoiceIt3.cs ./VoiceIt.cs
 
     nuget restore
     msbuild
