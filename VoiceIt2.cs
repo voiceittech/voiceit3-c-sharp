@@ -146,20 +146,6 @@ namespace VoiceIt2API
             return Task.FromResult(response.Content).GetAwaiter().GetResult();
         }
 
-        public string SwitchSubAccountType(string subAccountAPIKey)
-        {
-            var request = new RestRequest
-            {
-                Resource = "/subaccount/" + subAccountAPIKey + "/switchType",
-                Method = RestSharp.Method.POST
-            };
-            if (notificationUrl != "")
-            {
-              request.AddParameter("notificationURL", notificationUrl);
-            }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
-        }
 
         public string RegenerateSubAccountAPIToken(string subAccountAPIKey)
         {
