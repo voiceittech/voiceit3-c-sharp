@@ -83,7 +83,7 @@ then
 
     </Project>' > VoiceIt.csproj
 
-    cp /home/travis/build/voiceittech/VoiceIt2-C-Sharp/VoiceIt2.cs ./VoiceIt.cs
+    cp /home/travis/build/voiceittech/VoiceIt3-C-Sharp/VoiceIt2.cs ./VoiceIt.cs
 
     nuget restore
     msbuild
@@ -101,7 +101,7 @@ then
         <owners>Stephen Akers</owners>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Package Description</description>
-        <iconUrl>https://raw.githubusercontent.com/voiceittech/VoiceIt2-C-Sharp/master/voiceitlogo64.png</iconUrl>
+        <iconUrl>https://raw.githubusercontent.com/voiceittech/VoiceIt3-C-Sharp/master/voiceitlogo64.png</iconUrl>
         <dependencies>
           <group targetFramework=".NETStandard2.0">
             <dependency id="RestSharp" version="106.12.0" exclude="Build,Analyzers" />
