@@ -1,5 +1,6 @@
 <img src="./csharp.png" width="100%" style="width:100%" />
 
+[![API Test](https://github.com/voiceittech/VoiceIt3-C-Sharp/actions/workflows/test.yml/badge.svg)](https://github.com/voiceittech/VoiceIt3-C-Sharp/actions/workflows/test.yml)
 [![Version](https://img.shields.io/badge/version-2.8.0-blue)](https://github.com/voiceittech/VoiceIt3-C-Sharp)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/voiceittech/VoiceIt3-C-Sharp/blob/main/LICENSE)
 [![Platform](https://img.shields.io/badge/platform-C%23-lightgrey)](https://github.com/voiceittech/VoiceIt3-C-Sharp)
