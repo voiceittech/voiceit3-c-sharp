@@ -1,10 +1,10 @@
 <img src="./csharp.png" width="100%" style="width:100%" />
 
-[![API Test](https://github.com/voiceittech/VoiceIt3-C-Sharp/actions/workflows/test.yml/badge.svg)](https://github.com/voiceittech/VoiceIt3-C-Sharp/actions/workflows/test.yml)
-[![Dependabot](https://img.shields.io/github/issues-pr/voiceittech/VoiceIt3-C-Sharp/dependencies?label=dependabot&logo=dependabot&color=025e8c)](https://github.com/voiceittech/VoiceIt3-C-Sharp/pulls?q=is%3Apr+label%3Adependencies)
-[![Version](https://img.shields.io/badge/version-2.8.0-blue)](https://github.com/voiceittech/VoiceIt3-C-Sharp)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/voiceittech/VoiceIt3-C-Sharp/blob/main/LICENSE)
-[![Platform](https://img.shields.io/badge/platform-C%23-lightgrey)](https://github.com/voiceittech/VoiceIt3-C-Sharp)
+[![API Test](https://github.com/voiceittech/voiceit3-c-sharp/actions/workflows/test.yml/badge.svg)](https://github.com/voiceittech/voiceit3-c-sharp/actions/workflows/test.yml)
+[![Dependabot](https://img.shields.io/github/issues-pr/voiceittech/voiceit3-c-sharp/dependencies?label=dependabot&logo=dependabot&color=025e8c)](https://github.com/voiceittech/voiceit3-c-sharp/pulls?q=is%3Apr+label%3Adependencies)
+[![Version](https://img.shields.io/badge/version-3.0.0-blue)](https://github.com/voiceittech/voiceit3-c-sharp)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/voiceittech/voiceit3-c-sharp/blob/main/LICENSE)
+[![Platform](https://img.shields.io/badge/platform-C%23-lightgrey)](https://github.com/voiceittech/voiceit3-c-sharp)
 [![VoiceIt API](https://img.shields.io/badge/VoiceIt-API%203.0-blue)](https://voiceit.io)
 
 
@@ -13,7 +13,7 @@ A C# wrapper for VoiceIt's API 3.0 featuring Voice + Face Verification and Ident
 ## Installation
 
 ```bash
-git clone https://github.com/voiceittech/VoiceIt3-C-Sharp.git
+git clone https://github.com/voiceittech/voiceit3-c-sharp.git
 ```
 
 Add the project as a reference in your solution.
@@ -30,7 +30,7 @@ You can visit our [HTTP API 3.0 Documentation](https://voiceit.io/documentation)
 
 If you find this SDK useful, please consider giving it a star on GitHub — it helps others discover the project!
 
-[![GitHub stars](https://img.shields.io/github/stars/voiceittech/VoiceIt3-C-Sharp?style=social)](https://github.com/voiceittech/VoiceIt3-C-Sharp/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/voiceittech/voiceit3-c-sharp?style=social)](https://github.com/voiceittech/voiceit3-c-sharp/stargazers)
 
 ## License
 
