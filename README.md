@@ -2,7 +2,7 @@
 
 [![API Test](https://github.com/voiceittech/voiceit3-c-sharp/actions/workflows/test.yml/badge.svg)](https://github.com/voiceittech/voiceit3-c-sharp/actions/workflows/test.yml)
 [![Dependabot](https://img.shields.io/github/issues-pr/voiceittech/voiceit3-c-sharp/dependencies?label=dependabot&logo=dependabot&color=025e8c)](https://github.com/voiceittech/voiceit3-c-sharp/pulls?q=is%3Apr+label%3Adependencies)
-[![Version](https://img.shields.io/badge/version-3.0.3-blue)](https://github.com/voiceittech/voiceit3-c-sharp)
+[![Version](https://img.shields.io/badge/version-3.0.4-blue)](https://github.com/voiceittech/voiceit3-c-sharp)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/voiceittech/voiceit3-c-sharp/blob/main/LICENSE)
 [![Platform](https://img.shields.io/badge/platform-C%23-lightgrey)](https://github.com/voiceittech/voiceit3-c-sharp)
 [![VoiceIt API](https://img.shields.io/badge/VoiceIt-API%203.0-blue)](https://voiceit.io)
