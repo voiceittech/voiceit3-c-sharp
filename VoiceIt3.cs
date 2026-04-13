@@ -9,9 +9,13 @@ namespace VoiceIt3API
 {
     public class VoiceIt3
     {
-        const string VERSION = "3.0.4";
+        const string VERSION = "3.0.5";
         string notificationUrl = "";
         RestClient client;
+
+        // URL-encode a single path segment so caller-supplied IDs cannot
+        // change the endpoint or inject query parameters.
+        static string Enc(string s) => System.Uri.EscapeDataString(s ?? "");
 
         public VoiceIt3(string apiKey, string apiToken)
         {
@@ -66,7 +70,7 @@ namespace VoiceIt3API
         {
             var request = new RestRequest
             {
-                Resource = "/phrases/" + contentLanguage,
+                Resource = "/phrases/" + Enc(contentLanguage),
                 Method = RestSharp.Method.GET
             };
             if (notificationUrl != "")
@@ -151,7 +155,7 @@ namespace VoiceIt3API
         {
             var request = new RestRequest
             {
-                Resource = "/subaccount/" + subAccountAPIKey,
+                Resource = "/subaccount/" + Enc(subAccountAPIKey),
                 Method = RestSharp.Method.POST
             };
             
@@ -167,7 +171,7 @@ namespace VoiceIt3API
         {
             var request = new RestRequest
             {
-                Resource = "/subaccount/" + subAccountAPIKey,
+                Resource = "/subaccount/" + Enc(subAccountAPIKey),
                 Method = RestSharp.Method.DELETE
             };
             if (notificationUrl != "")
@@ -197,7 +201,7 @@ namespace VoiceIt3API
         {
             var request = new RestRequest
             {
-                Resource = "/users/" + userId,
+                Resource = "/users/" + Enc(userId),
                 Method = RestSharp.Method.GET
             };
             if (notificationUrl != "")
@@ -212,7 +216,7 @@ namespace VoiceIt3API
         {
             var request = new RestRequest
             {
-                Resource = "/users/" + userId,
+                Resource = "/users/" + Enc(userId),
                 Method = RestSharp.Method.DELETE
             };
             if (notificationUrl != "")
@@ -227,7 +231,7 @@ namespace VoiceIt3API
         {
             var request = new RestRequest
             {
-                Resource = "/users/" + userId + "/groups",
+                Resource = "/users/" + Enc(userId) + "/groups",
                 Method = RestSharp.Method.GET
             };
             if (notificationUrl != "")
@@ -257,7 +261,7 @@ namespace VoiceIt3API
         {
             var request = new RestRequest
             {
-                Resource = "/groups/" + groupId,
+                Resource = "/groups/" + Enc(groupId),
                 Method = RestSharp.Method.GET
             };
             if (notificationUrl != "")
@@ -272,7 +276,7 @@ namespace VoiceIt3API
         {
             var request = new RestRequest
             {
-                Resource = "/groups/" + groupId + "/exists",
+                Resource = "/groups/" + Enc(groupId) + "/exists",
                 Method = RestSharp.Method.GET
             };
             if (notificationUrl != "")
@@ -340,7 +344,7 @@ namespace VoiceIt3API
         {
             var request = new RestRequest
             {
-                Resource = "/groups/" + groupId,
+                Resource = "/groups/" + Enc(groupId),
                 Method = RestSharp.Method.DELETE
             };
             if (notificationUrl != "")
@@ -355,7 +359,7 @@ namespace VoiceIt3API
         {
             var request = new RestRequest
             {
-                Resource = "/enrollments/voice/" + userId,
+                Resource = "/enrollments/voice/" + Enc(userId),
                 Method = RestSharp.Method.GET
             };
             if (notificationUrl != "")
@@ -370,7 +374,7 @@ namespace VoiceIt3API
         {
             var request = new RestRequest
             {
-                Resource = "/enrollments/face/" + userId,
+                Resource = "/enrollments/face/" + Enc(userId),
                 Method = RestSharp.Method.GET
             };
             if (notificationUrl != "")
@@ -385,7 +389,7 @@ namespace VoiceIt3API
         {
             var request = new RestRequest
             {
-                Resource = "/enrollments/video/" + userId,
+                Resource = "/enrollments/video/" + Enc(userId),
                 Method = RestSharp.Method.GET
             };
             if (notificationUrl != "")
@@ -531,7 +535,7 @@ namespace VoiceIt3API
         {
             var request = new RestRequest
             {
-                Resource = "/enrollments/" + userId + "/all",
+                Resource = "/enrollments/" + Enc(userId) + "/all",
                 Method = RestSharp.Method.DELETE
             };
             if (notificationUrl != "")
@@ -807,7 +811,7 @@ namespace VoiceIt3API
         {
             var request = new RestRequest
             {
-                Resource = "/users/" + userId + "/token",
+                Resource = "/users/" + Enc(userId) + "/token",
                 Method = RestSharp.Method.POST
             };
             request.AddParameter("timeOut", secondsToTimeout.ToString());
@@ -819,7 +823,7 @@ namespace VoiceIt3API
         {
             var request = new RestRequest
             {
-                Resource = "/users/" + userId + "/expireTokens",
+                Resource = "/users/" + Enc(userId) + "/expireTokens",
                 Method = RestSharp.Method.POST
             };
             IRestResponse response = client.Execute(request);
