@@ -9,7 +9,7 @@ namespace VoiceIt3API
 {
     public class VoiceIt3
     {
-        const string VERSION = "3.0.5";
+        const string VERSION = "4.0.0";
         string notificationUrl = "";
         RestClient client;
 
@@ -17,31 +17,33 @@ namespace VoiceIt3API
         // change the endpoint or inject query parameters.
         static string Enc(string s) => System.Uri.EscapeDataString(s ?? "");
 
-        public VoiceIt3(string apiKey, string apiToken)
+        // Helper: send the request synchronously and return the body.
+        // RestSharp 112+ is async-first but kept Execute() for sync use.
+        string Send(RestRequest request)
         {
-            client = new RestClient();
-            client.BaseUrl = new Uri("https://api.voiceit.io");
-            client.Authenticator = new HttpBasicAuthenticator(apiKey, apiToken);
-            client.AddDefaultHeader("platformId", "30");
-            client.AddDefaultHeader("platformVersion", VERSION);
+            RestResponse response = client.Execute(request);
+            return response.Content ?? "";
         }
 
+        public VoiceIt3(string apiKey, string apiToken)
+            : this(apiKey, apiToken, "https://api.voiceit.io", proxy: null) { }
+
         public VoiceIt3(string apiKey, string apiToken, string customUrl)
-        {
-            client = new RestClient();
-            client.BaseUrl = new Uri(customUrl);
-            client.Authenticator = new HttpBasicAuthenticator(apiKey, apiToken);
-            client.AddDefaultHeader("platformId", "30");
-            client.AddDefaultHeader("platformVersion", VERSION);
-        }
+            : this(apiKey, apiToken, customUrl, proxy: null) { }
 
         // Overloaded constructor for proxy support
         public VoiceIt3(string apiKey, string apiToken, string proxyUrl, int proxyPort)
+            : this(apiKey, apiToken, "https://api.voiceit.io",
+                   proxy: new WebProxy(proxyUrl, proxyPort)) { }
+
+        VoiceIt3(string apiKey, string apiToken, string baseUrl, IWebProxy proxy)
         {
-            client = new RestClient();
-            client.Proxy = new WebProxy(proxyUrl, proxyPort);
-            client.BaseUrl = new Uri("https://api.voiceit.io");
-            client.Authenticator = new HttpBasicAuthenticator(apiKey, apiToken);
+            var options = new RestClientOptions(baseUrl)
+            {
+                Authenticator = new HttpBasicAuthenticator(apiKey, apiToken),
+            };
+            if (proxy != null) options.Proxy = proxy;
+            client = new RestClient(options);
             client.AddDefaultHeader("platformId", "30");
             client.AddDefaultHeader("platformVersion", VERSION);
         }
@@ -71,14 +73,13 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/phrases/" + Enc(contentLanguage),
-                Method = RestSharp.Method.GET
+                Method = Method.Get
             };
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string GetAllUsers()
@@ -86,14 +87,13 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/users",
-                Method = RestSharp.Method.GET
+                Method = Method.Get
             };
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string CreateUnmanagedSubAccount(string firstName, string lastName, string email, string password, string contentLanguage)
@@ -101,7 +101,7 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/subaccount/unmanaged",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
 
             if(firstName != "")
@@ -119,8 +119,7 @@ namespace VoiceIt3API
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string CreateManagedSubAccount(string firstName, string lastName, string email, string password, string contentLanguage)
@@ -128,7 +127,7 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/subaccount/managed",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
 
             if(firstName != "")
@@ -146,8 +145,7 @@ namespace VoiceIt3API
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
 
@@ -156,15 +154,14 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/subaccount/" + Enc(subAccountAPIKey),
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string DeleteSubAccount(string subAccountAPIKey)
@@ -172,14 +169,13 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/subaccount/" + Enc(subAccountAPIKey),
-                Method = RestSharp.Method.DELETE
+                Method = Method.Delete
             };
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string CreateUser()
@@ -187,14 +183,13 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/users",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string CheckUserExists(string userId)
@@ -202,14 +197,13 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/users/" + Enc(userId),
-                Method = RestSharp.Method.GET
+                Method = Method.Get
             };
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string DeleteUser(string userId)
@@ -217,14 +211,13 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/users/" + Enc(userId),
-                Method = RestSharp.Method.DELETE
+                Method = Method.Delete
             };
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string GetGroupsForUser(string userId)
@@ -232,14 +225,13 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/users/" + Enc(userId) + "/groups",
-                Method = RestSharp.Method.GET
+                Method = Method.Get
             };
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string GetAllGroups()
@@ -247,14 +239,13 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/groups",
-                Method = RestSharp.Method.GET
+                Method = Method.Get
             };
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string GetGroup(string groupId)
@@ -262,14 +253,13 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/groups/" + Enc(groupId),
-                Method = RestSharp.Method.GET
+                Method = Method.Get
             };
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string GroupExists(string groupId)
@@ -277,14 +267,13 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/groups/" + Enc(groupId) + "/exists",
-                Method = RestSharp.Method.GET
+                Method = Method.Get
             };
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string CreateGroup(string description)
@@ -292,7 +281,7 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/groups",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("description", description);
 
@@ -300,8 +289,7 @@ namespace VoiceIt3API
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string AddUserToGroup(string groupId, string userId)
@@ -309,7 +297,7 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/groups/addUser",
-                Method = RestSharp.Method.PUT
+                Method = Method.Put
             };
             request.AddParameter("groupId", groupId);
             request.AddParameter("userId", userId);
@@ -318,8 +306,7 @@ namespace VoiceIt3API
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string RemoveUserFromGroup(string groupId, string userId)
@@ -327,7 +314,7 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/groups/removeUser",
-                Method = RestSharp.Method.DELETE
+                Method = Method.Delete
             };
             request.AddQueryParameter("groupId", groupId);
             request.AddQueryParameter("userId", userId);
@@ -336,8 +323,7 @@ namespace VoiceIt3API
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string DeleteGroup(string groupId)
@@ -345,14 +331,13 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/groups/" + Enc(groupId),
-                Method = RestSharp.Method.DELETE
+                Method = Method.Delete
             };
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string GetAllVoiceEnrollments(string userId)
@@ -360,14 +345,13 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/enrollments/voice/" + Enc(userId),
-                Method = RestSharp.Method.GET
+                Method = Method.Get
             };
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string GetAllFaceEnrollments(string userId)
@@ -375,14 +359,13 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/enrollments/face/" + Enc(userId),
-                Method = RestSharp.Method.GET
+                Method = Method.Get
             };
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string GetAllVideoEnrollments(string userId)
@@ -390,14 +373,13 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/enrollments/video/" + Enc(userId),
-                Method = RestSharp.Method.GET
+                Method = Method.Get
             };
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string CreateVoiceEnrollment(string userId, string contentLanguage, string phrase, string recordingPath)
@@ -410,19 +392,18 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/enrollments/voice",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("userId", userId);
             request.AddParameter("contentLanguage", contentLanguage);
             request.AddParameter("phrase", phrase);
-            request.AddFileBytes("recording", recording, "recording");
+            request.AddFile("recording", recording, "recording");
 
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string CreateVoiceEnrollmentByUrl(string userId, string contentLanguage, string phrase, string fileUrl)
@@ -430,7 +411,7 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/enrollments/voice/byUrl",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("userId", userId);
             request.AddParameter("contentLanguage", contentLanguage);
@@ -441,8 +422,7 @@ namespace VoiceIt3API
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string CreateFaceEnrollment(string userId, string videoPath)
@@ -455,17 +435,16 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/enrollments/face",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("userId", userId);
-            request.AddFileBytes("video", video, "video");
+            request.AddFile("video", video, "video");
 
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string CreateFaceEnrollmentByUrl(string userId, string fileUrl)
@@ -473,7 +452,7 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/enrollments/face/byUrl",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("userId", userId);
             request.AddParameter("fileUrl", fileUrl);
@@ -482,8 +461,7 @@ namespace VoiceIt3API
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string CreateVideoEnrollment(string userId, string contentLanguage, string phrase, string videoPath)
@@ -496,19 +474,18 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/enrollments/video",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("userId", userId);
             request.AddParameter("contentLanguage", contentLanguage);
             request.AddParameter("phrase", phrase);
-            request.AddFileBytes("video", video, "video");
+            request.AddFile("video", video, "video");
 
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string CreateVideoEnrollmentByUrl(string userId, string contentLanguage, string phrase, string fileUrl)
@@ -516,7 +493,7 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/enrollments/video/byUrl",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("userId", userId);
             request.AddParameter("contentLanguage", contentLanguage);
@@ -527,8 +504,7 @@ namespace VoiceIt3API
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string DeleteAllEnrollments(string userId)
@@ -536,14 +512,13 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/enrollments/" + Enc(userId) + "/all",
-                Method = RestSharp.Method.DELETE
+                Method = Method.Delete
             };
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string VoiceVerification(string userId, string contentLanguage, string phrase, string recordingPath)
@@ -556,19 +531,18 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/verification/voice",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("userId", userId);
             request.AddParameter("contentLanguage", contentLanguage);
             request.AddParameter("phrase", phrase);
-            request.AddFileBytes("recording", recording, "recording");
+            request.AddFile("recording", recording, "recording");
 
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string VoiceVerificationByUrl(string userId, string contentLanguage, string phrase, string fileUrl)
@@ -576,7 +550,7 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/verification/voice/byUrl",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("userId", userId);
             request.AddParameter("contentLanguage", contentLanguage);
@@ -587,8 +561,7 @@ namespace VoiceIt3API
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string FaceVerification(string userId, string videoPath)
@@ -601,17 +574,16 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/verification/face",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("userId", userId);
-            request.AddFileBytes("video", video, "video");
+            request.AddFile("video", video, "video");
 
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string FaceVerificationByUrl(string userId, string fileUrl)
@@ -619,7 +591,7 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/verification/face/byUrl",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("userId", userId);
             request.AddParameter("fileUrl", fileUrl);
@@ -628,8 +600,7 @@ namespace VoiceIt3API
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string VideoVerification(string userId, string contentLanguage, string phrase, string videoPath)
@@ -642,19 +613,18 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/verification/video",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("userId", userId);
             request.AddParameter("contentLanguage", contentLanguage);
             request.AddParameter("phrase", phrase);
-            request.AddFileBytes("video", video, "video");
+            request.AddFile("video", video, "video");
 
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string VideoVerificationByUrl(string userId, string contentLanguage, string phrase, string fileUrl)
@@ -662,7 +632,7 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/verification/video/byUrl",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("userId", userId);
             request.AddParameter("contentLanguage", contentLanguage);
@@ -673,8 +643,7 @@ namespace VoiceIt3API
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string VoiceIdentification(string groupId, string contentLanguage, string phrase, string recordingPath)
@@ -687,19 +656,18 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/identification/voice",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("groupId", groupId);
             request.AddParameter("contentLanguage", contentLanguage);
             request.AddParameter("phrase", phrase);
-            request.AddFileBytes("recording", recording, "recording");
+            request.AddFile("recording", recording, "recording");
 
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string VoiceIdentificationByUrl(string groupId, string contentLanguage, string phrase, string fileUrl)
@@ -707,7 +675,7 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/identification/voice/byUrl",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("groupId", groupId);
             request.AddParameter("contentLanguage", contentLanguage);
@@ -718,8 +686,7 @@ namespace VoiceIt3API
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string FaceIdentification(string groupId, string videoPath) {
@@ -731,17 +698,16 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/identification/face",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("groupId", groupId);
-            request.AddFileBytes("video", video, "video");
+            request.AddFile("video", video, "video");
 
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string FaceIdentificationByUrl(string groupId, string fileUrl)
@@ -749,7 +715,7 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/identification/face/byUrl",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("groupId", groupId);
             request.AddParameter("fileUrl", fileUrl);
@@ -758,8 +724,7 @@ namespace VoiceIt3API
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string VideoIdentification(string groupId, string contentLanguage, string phrase, string videoPath)
@@ -772,19 +737,18 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/identification/video",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("groupId", groupId);
             request.AddParameter("contentLanguage", contentLanguage);
             request.AddParameter("phrase", phrase);
-            request.AddFileBytes("video", video, "video");
+            request.AddFile("video", video, "video");
 
             if (notificationUrl != "")
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string VideoIdentificationByUrl(string groupId, string contentLanguage, string phrase, string fileUrl)
@@ -792,7 +756,7 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/identification/video/byUrl",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("groupId", groupId);
             request.AddParameter("contentLanguage", contentLanguage);
@@ -803,8 +767,7 @@ namespace VoiceIt3API
             {
               request.AddParameter("notificationURL", notificationUrl);
             }
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string CreateUserToken(string userId, int secondsToTimeout)
@@ -812,11 +775,10 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/users/" + Enc(userId) + "/token",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
             request.AddParameter("timeOut", secondsToTimeout.ToString());
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
         public string ExpireUserTokens(string userId)
@@ -824,10 +786,9 @@ namespace VoiceIt3API
             var request = new RestRequest
             {
                 Resource = "/users/" + Enc(userId) + "/expireTokens",
-                Method = RestSharp.Method.POST
+                Method = Method.Post
             };
-            IRestResponse response = client.Execute(request);
-            return Task.FromResult(response.Content).GetAwaiter().GetResult();
+            return Send(request);
         }
 
     }
