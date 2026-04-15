@@ -41,6 +41,7 @@ namespace VoiceIt3API
             var options = new RestClientOptions(baseUrl)
             {
                 Authenticator = new HttpBasicAuthenticator(apiKey, apiToken),
+                MaxTimeout = 30000,
             };
             if (proxy != null) options.Proxy = proxy;
             client = new RestClient(options);
