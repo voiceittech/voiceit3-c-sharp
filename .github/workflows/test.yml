@@ -15,10 +15,28 @@ jobs:
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '8.0.x'
-      - name: Build and run test
+      - name: Build and run test against api.voiceit.io
         env:
           VOICEIT_API_KEY: ${{ secrets.VOICEIT_API_KEY }}
           VOICEIT_API_TOKEN: ${{ secrets.VOICEIT_API_TOKEN }}
         run: |
-          echo "C# SDK is source-only distribution. Verifying syntax..."
-          dotnet-script TestExample.cs 2>/dev/null || echo "Structural verification only (no .csproj)"
+          # Source-only SDK: synthesize a console project that compiles the SDK
+          # (voiceit3.cs, needs RestSharp) + TestExample.cs and runs it. Run from
+          # the repo root so TestExample's relative test-data/ paths resolve.
+          cat > citest.csproj <<'EOF'
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net8.0</TargetFramework>
+              <Nullable>disable</Nullable>
+              <ImplicitUsings>disable</ImplicitUsings>
+              <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+            </PropertyGroup>
+            <ItemGroup>
+              <Compile Include="TestExample.cs" />
+              <Compile Include="voiceit3.cs" />
+              <PackageReference Include="RestSharp" Version="112.*" />
+            </ItemGroup>
+          </Project>
+          EOF
+          dotnet run -c Release --project citest.csproj
